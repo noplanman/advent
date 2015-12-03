@@ -3,8 +3,8 @@
  * Challenge for day 3 of Advent of Code.
  * http://adventofcode.com/day/3
  *
- * For part 2, it would be easier to have only 1 array of all visited positions
- * instead of individual ones for santa and robot, but this way we can keep track of both.
+ * For part 2, the arrays of individually visited positions could be removed,
+ * but this way we can keep track of both santa and the robot seperately.
  *
  * @package AOC_Solutions
  */
@@ -48,6 +48,7 @@ class Challenge3 extends Challenge {
 			'y'   => 0,
 			'pos' => [ '0 0' => 1 ],
 		],
+		'pos'   => [ '0 0' => 2 ],
 	];
 
 	/**
@@ -78,8 +79,8 @@ class Challenge3 extends Challenge {
 		$y1 = &$this->_positions_part_1['y'];
 
 		for ( $direction = 0; $direction < $directions_count; $direction++ ) {
-			$who = ( 0 === $direction % 2 ) ? 'santa' : 'robot';
 			// X and Y for part 2.
+			$who = ( 0 === $direction % 2 ) ? 'santa' : 'robot';
 			$x2 = &$this->_positions_part_2[ $who ]['x'];
 			$y2 = &$this->_positions_part_2[ $who ]['y'];
 
@@ -91,6 +92,9 @@ class Challenge3 extends Challenge {
 				default : continue; // Shouldn't ever happen.
 			}
 			$this->_update_position( $this->_positions_part_1['pos'], $x1, $y1 );
+
+			// For part 2, update the individual positions and the collective ones.
+			$this->_update_position( $this->_positions_part_2['pos'], $x2, $y2 );
 			$this->_update_position( $this->_positions_part_2[ $who ]['pos'], $x2, $y2 );
 		}
 	}
@@ -106,16 +110,6 @@ class Challenge3 extends Challenge {
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		// We need to merge all positions together.
-		$all_positions = array();
-		foreach ( array( $this->_positions_part_2['santa']['pos'], $this->_positions_part_2['robot']['pos'] ) as $positions ) {
-			foreach ( $positions as $position => $count ) {
-				if ( ! isset( $all_positions[ $position ] ) ) {
-					$all_positions[ $position ] = 0;
-				}
-				$all_positions[ $position ] += $count;
-			}
-		}
-		echo 'Houses with at least 1 present: ' . ( count( $all_positions ) );
+		echo 'Houses with at least 1 present: ' . count( $this->_positions_part_2['pos'] );
 	}
 }
