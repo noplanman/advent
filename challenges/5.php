@@ -28,7 +28,7 @@ class Challenge5 extends Challenge {
 	/**
 	 * Check if the string has any illegal letter combinations. (For part 1)
 	 *
-	 * @param string  $string The string to check.
+	 * @param string $string The string to check.
 	 * @return boolean If this check passes.
 	 */
 	private function _has_no_illegals( $string ) {
@@ -44,7 +44,7 @@ class Challenge5 extends Challenge {
 	/**
 	 * Check if the string has at least 3 vowels. (For part 1)
 	 *
-	 * @param string  $string The string to check.
+	 * @param string $string The string to check.
 	 * @return boolean If this check passes.
 	 */
 	private function _has_three_vowels( $string ) {
@@ -59,7 +59,7 @@ class Challenge5 extends Challenge {
 	/**
 	 * Check if the string has a double letter. (For part 1)
 	 *
-	 * @param string  $string The string to check.
+	 * @param string $string The string to check.
 	 * @return boolean If this check passes.
 	 */
 	private function _has_double_letter( $string ) {
@@ -74,7 +74,7 @@ class Challenge5 extends Challenge {
 	/**
 	 * Check if the string has at least two letter pairs. (For part 1)
 	 *
-	 * @param string  $string The string to check.
+	 * @param string $string The string to check.
 	 * @return boolean If this check passes.
 	 */
 	private function _has_two_pairs( $string ) {
@@ -92,7 +92,7 @@ class Challenge5 extends Challenge {
 	/**
 	 * Check if the string has a letter sandwich. (For part 2)
 	 *
-	 * @param string  $string The string to check.
+	 * @param string $string The string to check.
 	 * @return boolean If this check passes.
 	 */
 	private function _has_letter_sandwich( $string ) {
@@ -110,30 +110,23 @@ class Challenge5 extends Challenge {
 	public function solve() {
 		$all_strings = explode( "\n", $this->_input );
 
-		$checks_part_1 = [ '_has_no_illegals', '_has_three_vowels', '_has_double_letter' ];
-		$checks_part_2 = [ '_has_two_pairs', '_has_letter_sandwich' ];
+		$part_checks = [
+			1 => [ '_has_no_illegals', '_has_three_vowels', '_has_double_letter' ],
+			2 => [ '_has_two_pairs', '_has_letter_sandwich' ],
+		];
 
 		foreach ( $all_strings as $string ) {
-			// Only increment nice string counters if all checks pass.
-			// Part 1.
-			$valid = true;
-			foreach ( $checks_part_1 as $check ) {
-				if ( ! call_user_func( [ $this, $check ], $string ) ) {
-					$valid = false;
-					break;
+			foreach ( $part_checks as $part => $checks ) {
+				$valid = true;
+				foreach ( $checks as $check ) {
+					if ( ! call_user_func( [ $this, $check ], $string ) ) {
+						$valid = false;
+						break;
+					}
 				}
+				// Only increment nice string counter if all checks pass.
+				$valid && $this->_nice_strings[ $part ]++;
 			}
-			$valid && $this->_nice_strings[1]++;
-
-			// Part 2.
-			$valid = true;
-			foreach ( $checks_part_2 as $check ) {
-				if ( ! call_user_func( [ $this, $check ], $string ) ) {
-					$valid = false;
-					break;
-				}
-			}
-			$valid && $this->_nice_strings[2]++;
 		}
 	}
 
