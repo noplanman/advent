@@ -37,6 +37,15 @@ abstract class Challenge {
 	}
 
 	/**
+	 * Return the day number of this challenge.
+	 *
+	 * @return integer The day number.
+	 */
+	final static public function day() {
+		return static::$_day;
+	}
+
+	/**
 	 * Get the challenge input of a given day.
 	 *
 	 * @throws Exception An exception if an invalid day is provided.

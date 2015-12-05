@@ -24,6 +24,10 @@ foreach ( $challenges as $challenge ) {
 	try {
 		call_user_func( array( $challenge, 'output_header' ) );
 		$challenge = new $challenge();
+		if ( isset( $_GET['day'] ) && intval( $_GET['day'] ) !== $challenge->day() ) {
+			echo "Skipped\n\n";
+			continue;
+		}
 		$challenge->load_input();
 		$challenge->solve();
 		$challenge->output_part_1();
