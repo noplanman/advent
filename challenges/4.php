@@ -19,31 +19,49 @@ class Challenge4 extends Challenge {
 	protected static $_day = 4;
 
 	/**
-	 * The current number.
+	 * The value manager.
 	 *
-	 * @var integer
+	 * @var array
 	 */
-	private $_number = 1;
-
-	/**
-	 * The current MD5 hash.
-	 *
-	 * @var string
-	 */
-	private $_md5_hash = null;
+	private $_values = [
+		1 => [
+			'found'    => false,
+			'prefix'   => '00000',
+			'number'   => 1,
+			'md5_hash' => '',
+		],
+		2 => [
+			'found'    => false,
+			'prefix'   => '000000',
+			'number'   => 1,
+			'md5_hash' => '',
+		],
+	];
 
 	/**
 	 * The main method where the challenge gets solved.
 	 */
 	public function solve() {
-		$prefix = '00000';
+		$all_found = false;
+		$number = 0;
+		$md5_hash = '';
 
-		while ( true ) {
-			$this->_md5_hash = md5( $this->_input . $this->_number );
-			if ( 0 === strpos( $this->_md5_hash, $prefix ) ) {
-				break;
-			} else {
-				$this->_number++;
+		while ( ! $all_found ) {
+			$all_found = true;
+			$md5_hash = md5( $this->_input . ++$number );
+
+			foreach ( $this->_values as $key => &$value ) {
+				if ( $value['found'] ) {
+					continue;
+				}
+
+				if ( 0 === strpos( $md5_hash, $value['prefix'] ) ) {
+					$value['found'] = true;
+					$value['number'] = $number;
+					$value['md5_hash'] = $md5_hash;
+				}
+
+				$all_found = false;
 			}
 		}
 	}
@@ -52,13 +70,13 @@ class Challenge4 extends Challenge {
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		echo 'AdventCoin number: ' . $this->_number . ' - MD5 hash: ' . $this->_md5_hash;
+		echo 'AdventCoin number 1: ' . $this->_values[1]['number'] . ' - MD5 hash: ' . $this->_values[1]['md5_hash'];
 	}
 
 	/**
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'AdventCoin number 2: ' . $this->_values[2]['number'] . ' - MD5 hash: ' . $this->_values[2]['md5_hash'];
 	}
 }
