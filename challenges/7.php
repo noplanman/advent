@@ -44,7 +44,8 @@ class Challenge7 extends Challenge {
 		}
 		list( $in, $out ) = explode( ' -> ', $step );
 		$op_parts = explode( ' ', $in );
-		if ( false !== strpos( $in, ' AND ' ) || false !== strpos( $in, ' OR ' ) ) {
+
+		if ( preg_match( '/ (and|or) /i', $in ) ) {
 			list( $in1, $op, $in2 ) = $op_parts;
 			if ( isset( $this->_wires[ $in1 ] ) && isset( $this->_wires[ $in2 ] ) ) {
 				$in1 = $this->_wires[ $in1 ];
@@ -54,13 +55,13 @@ class Challenge7 extends Challenge {
 				$in2 = $this->_wires[ $in2 ];
 				return compact( 'op', 'out', 'in1', 'in2' );
 			}
-		} elseif ( false !== strpos( $in, ' LSHIFT ' ) || false !== strpos( $in, ' RSHIFT ' ) ) {
+		} elseif ( preg_match( '/ (r|l)shift /i', $in ) ) {
 			list( $in, $op, $by ) = $op_parts;
 			if ( isset( $this->_wires[ $in ] ) ) {
 				$in = $this->_wires[ $in ];
 				return compact( 'op', 'out', 'in', 'by' );
 			}
-		} elseif ( false !== strpos( $in, 'NOT ' ) ) {
+		} elseif ( preg_match( '/^not /i', $in ) ) {
 			list( $op, $in ) = $op_parts;
 			if ( isset( $this->_wires[ $in ] ) ) {
 				$in = $this->_wires[ $in ];
@@ -75,7 +76,6 @@ class Challenge7 extends Challenge {
 				return compact( 'op', 'out', 'in' );
 			}
 		}
-
 		return null;
 	}
 
@@ -124,7 +124,7 @@ class Challenge7 extends Challenge {
 		while ( ! $finished ) {
 			$finished = true;
 			foreach ( $steps as &$step ) {
-				( '14146 -> b' === $step ) && $step = $this->_solutions[1] . ' -> b';
+				( preg_match( '/-> b$/', $step ) ) && $step = $this->_solutions[1] . ' -> b';
 				$this->_process_step( $step ) && $finished = false;
 			}
 		}
