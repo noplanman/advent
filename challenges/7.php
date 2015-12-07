@@ -26,6 +26,13 @@ class Challenge7 extends Challenge {
 	private $_wires = [];
 
 	/**
+	 * Seperate array for the solutions, as the wires array gets overwritten.
+	 *
+	 * @var array
+	 */
+	private $_solutions = [ 1 => null, 2 => null ];
+
+	/**
 	 * Extract the step info from the current step.
 	 *
 	 * @param string $step The current step.
@@ -73,6 +80,29 @@ class Challenge7 extends Challenge {
 	}
 
 	/**
+	 * Process the passed step.
+	 *
+	 * @param string $step The current step to process.
+	 * @return boolean If the step has finished processing.
+	 */
+	private function _process_step( &$step ) {
+		if ( $_step = $this->_get_step_info( $step ) ) {
+			extract( $_step );
+			switch ( $op ) {
+				case 'SET':    $this->_wires[ $out ] = $in;         break;
+				case 'AND':    $this->_wires[ $out ] = $in1 & $in2; break;
+				case 'OR':     $this->_wires[ $out ] = $in1 | $in2; break;
+				case 'LSHIFT': $this->_wires[ $out ] = $in << $by;  break;
+				case 'RSHIFT': $this->_wires[ $out ] = $in >> $by;  break;
+				case 'NOT':    $this->_wires[ $out ] = ~ $in;       break;
+			}
+			$step = null;
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * The main method where the challenge gets solved.
 	 */
 	public function solve() {
@@ -82,34 +112,36 @@ class Challenge7 extends Challenge {
 		while ( ! $finished ) {
 			$finished = true;
 			foreach ( $steps as &$step ) {
-				if ( $_step = $this->_get_step_info( $step ) ) {
-					extract( $_step );
-					switch ( $op ) {
-						case 'SET':    $this->_wires[ $out ] = $in;         break;
-						case 'AND':    $this->_wires[ $out ] = $in1 & $in2; break;
-						case 'OR':     $this->_wires[ $out ] = $in1 | $in2; break;
-						case 'LSHIFT': $this->_wires[ $out ] = $in << $by;  break;
-						case 'RSHIFT': $this->_wires[ $out ] = $in >> $by;  break;
-						case 'NOT':    $this->_wires[ $out ] = ~ $in;       break;
-					}
-					$finished = false;
-					$step = null;
-				}
+				$this->_process_step( $step ) && $finished = false;
 			}
 		}
+		$this->_solutions[1] = ( isset( $this->_wires['a'] ) ) ? $this->_wires['a'] : 'Unknown';
+
+		// Part 2, same thing but giving b the signal of our previous a.
+		$steps = explode( "\n", $this->_input );
+		$this->_wires = [];
+		$finished = false;
+		while ( ! $finished ) {
+			$finished = true;
+			foreach ( $steps as &$step ) {
+				( '14146 -> b' === $step ) && $step = $this->_solutions[1] . ' -> b';
+				$this->_process_step( $step ) && $finished = false;
+			}
+		}
+		$this->_solutions[2] = ( isset( $this->_wires['a'] ) ) ? $this->_wires['a'] : 'Unknown';
 	}
 
 	/**
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		printf( 'Value of wire a: %s', ( isset( $this->_wires['a'] ) ) ? $this->_wires['a'] : 'Unknown' );
+		echo 'Value of wire a for part 1: ' . $this->_solutions[1];
 	}
 
 	/**
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'Value of wire a for part 2: ' . $this->_solutions[2];
 	}
 }
