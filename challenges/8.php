@@ -23,7 +23,7 @@ class Challenge8 extends Challenge {
 	 *
 	 * @var array
 	 */
-	private $_chars_num = [ 'code' => 0, 'memory' => 0 ];
+	private $_chars_num = [ 'code' => 0, 'memory' => 0, 'unmemory' => 0 ];
 
 	/**
 	 * The main method where the challenge gets solved.
@@ -32,8 +32,12 @@ class Challenge8 extends Challenge {
 		$lines = explode( "\n", $this->_input );
 		foreach ( $lines as $line ) {
 			$this->_chars_num['code'] += strlen( $line );
+
 			$memory_line = preg_replace( '/(\\\\\"|\\\\\\\\|\\\\x[0-9a-f]{2})/', ' ', $line );
 			$this->_chars_num['memory'] += strlen( $memory_line ) - 2;
+
+			$unmemory_line = preg_replace( '/(\\\\|")/', '  ', $line );
+			$this->_chars_num['unmemory'] += strlen( $unmemory_line ) + 2;
 		}
 	}
 
@@ -49,6 +53,7 @@ class Challenge8 extends Challenge {
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		extract( $this->_chars_num );
+		printf( 'Characters in unmemory (%d) - characters in code (%d) = %d', $unmemory, $code, $unmemory - $code );
 	}
 }
