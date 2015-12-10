@@ -44,6 +44,7 @@ class Challenge9 extends Challenge {
 			if ( empty( $this->_shortest_distance ) || $distance < min( $this->_shortest_distance ) ) {
 				$this->_shortest_distance = [ implode( ' -> ', $perms ) => $distance ];
 			} elseif ( $distance === min( $this->_shortest_distance ) ) {
+				// Save all routes that have the same shortest distance.
 				$this->_shortest_distance[ implode( ' -> ', $perms ) ] = $distance;
 			}
 		} else {
@@ -64,19 +65,15 @@ class Challenge9 extends Challenge {
 	 * @return integer Distance for this route.
 	 */
 	private function _get_distance( $destinations ) {
-		$to = null;
-		$d = 0;
+		$distance = 0;
+		$to = array_shift( $destinations );
 
-		foreach ( $destinations as $destination ) {
-			if ( ! isset( $to ) ) {
-				$to = $destination;
-				continue;
-			}
+		while ( $destinations ) {
 			$from = $to;
-			$to = $destination;
-			$d += $this->_destinations[ $from ][ $to ];
+			$to = array_shift( $destinations );
+			$distance += $this->_destinations[ $from ][ $to ];
 		}
-		return $d;
+		return $distance;
 	}
 
 	/**
