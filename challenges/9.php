@@ -26,12 +26,18 @@ class Challenge9 extends Challenge {
 	private $_destinations = [];
 
 	/**
-	 * Save the shortest distance, including the route(s) used.
+	 * Save the shortest distance, including the route(s) used. (For part 1)
 	 *
 	 * @var array
 	 */
 	private $_shortest_distance = [];
 
+	/**
+	 * Save the furthest distance, including the route(s) used. (For part 2)
+	 *
+	 * @var array
+	 */
+	private $_furthest_distance = [];
 
 	/**
 	 * Calculate distances of all permutations. (http://stackoverflow.com/a/10223120/3757422)
@@ -41,11 +47,21 @@ class Challenge9 extends Challenge {
 	private function _calculate_distances( $items, $perms = [] ) {
 		if ( empty( $items ) ) {
 			$distance = $this->_get_distance( $perms );
+
+			// Part 1, shortest distance.
 			if ( empty( $this->_shortest_distance ) || $distance < min( $this->_shortest_distance ) ) {
 				$this->_shortest_distance = [ implode( ' -> ', $perms ) => $distance ];
 			} elseif ( $distance === min( $this->_shortest_distance ) ) {
 				// Save all routes that have the same shortest distance.
 				$this->_shortest_distance[ implode( ' -> ', $perms ) ] = $distance;
+			}
+
+			// Part 2, furthest distance.
+			if ( empty( $this->_furthest_distance ) || $distance > max( $this->_furthest_distance ) ) {
+				$this->_furthest_distance = [ implode( ' -> ', $perms ) => $distance ];
+			} elseif ( $distance === max( $this->_furthest_distance ) ) {
+				// Save all routes that have the same furthest distance.
+				$this->_furthest_distance[ implode( ' -> ', $perms ) ] = $distance;
 			}
 		} else {
 			for ( $i = count( $items ) - 1; $i >= 0; --$i ) {
@@ -105,6 +121,10 @@ class Challenge9 extends Challenge {
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'Furthest route is ' . min( $this->_furthest_distance ) . "\n";
+		foreach ( array_keys( $this->_furthest_distance ) as $furthest_route ) {
+			echo $furthest_route . "\n";
+		}
+		echo "\n";
 	}
 }
