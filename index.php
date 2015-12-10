@@ -22,6 +22,8 @@ $challenges = array_filter( get_declared_classes(), function( $class ) {
 
 foreach ( $challenges as $challenge ) {
 	try {
+		$mem = memory_get_usage();
+		$time = microtime( true );
 		call_user_func( array( $challenge, 'output_header' ) );
 		$challenge = new $challenge();
 		if ( isset( $_GET['day'] ) && intval( $_GET['day'] ) !== $challenge->day() ) {
@@ -30,6 +32,11 @@ foreach ( $challenges as $challenge ) {
 		}
 		$challenge->load_input();
 		$challenge->solve();
+		printf(
+			'Memory used: %dB, Time used: %fs' . "\n",
+			memory_get_usage() - $mem,
+			microtime( true ) - $time
+		);
 		$challenge->output_part_1();
 		echo "\n";
 		$challenge->output_part_2();
