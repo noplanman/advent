@@ -26,6 +26,13 @@ class Challenge10 extends Challenge {
 	private $_num = null;
 
 	/**
+	 * Array to remember the solutions for both parts.
+	 *
+	 * @var array
+	 */
+	private $_nums = [];
+
+	/**
 	 * Make a number string from the passed numbers.
 	 *
 	 * @param string $nums Number string to process.
@@ -52,23 +59,34 @@ class Challenge10 extends Challenge {
 	 * The main method where the challenge gets solved.
 	 */
 	public function solve() {
+		// When playing with huge numbers, you need more resources...
+		ini_set( 'memory_limit', '768M' );
+		ini_set( 'max_execution_time', 60 );
+
 		$this->_num = $this->_input;
 		for ( $i = 0; $i < 40; $i++ ) {
 			$this->_num = $this->_num_string( $this->_num );
 		}
+		$this->_nums[1] = $this->_num;
+
+		// For part 2 we do this another 10 times.
+		for ( $i = 0; $i < 10; $i++ ) {
+			$this->_num = $this->_num_string( $this->_num );
+		}
+		$this->_nums[2] = $this->_num;
 	}
 
 	/**
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		echo 'Length after 40 passes: ' . strlen( $this->_num );
+		echo 'Length after 40 passes: ' . strlen( $this->_nums[1] );
 	}
 
 	/**
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'Length after 50 passes: ' . strlen( $this->_nums[2] );
 	}
 }
