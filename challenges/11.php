@@ -64,16 +64,8 @@ class Challenge11 extends Challenge {
 	 * @return string Next password.
 	 */
 	private function _get_next_pw( $pw ) {
-		$pw_len = strlen( $pw );
-		for ( $i = $pw_len - 1; $i >= 0; $i-- ) {
-			$ord = ord( $pw[ $i ] );
-			if ( ( ord( 'z' ) - $ord ) > 0 ) {
-				$pw[ $i ] = chr( $ord + 1 );
-				break;
-			} else {
-				$pw[ $i ] = 'a';
-			}
-		}
+		// Nice and simple: http://stackoverflow.com/a/3567218/3757422
+		$pw++;
 
 		// Check for illegal characters.
 		$illegals = preg_split( '/(i|o|l)/', $pw );
