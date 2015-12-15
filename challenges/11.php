@@ -19,11 +19,11 @@ class Challenge11 extends Challenge {
 	protected static $_day = 11;
 
 	/**
-	 * The next valid password.
+	 * The next valid passwords for part 1 and 2.
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $_next_pw = null;
+	private $_next_pw = [];
 
 	/**
 	 * Check if the password has a 3 letter straight.
@@ -86,17 +86,19 @@ class Challenge11 extends Challenge {
 	}
 
 	/**
-	 * The main method where the challenge gets solved.
+	 * Get the next VALID password.
+	 *
+	 * @param string $pw Current password.
+	 * @return string Next VALID password.
 	 */
-	public function solve() {
-		$pw = $this->_input;
+	private function _get_next_valid_pw( $pw ) {
 		$pw_found = false;
 
 		while ( ! $pw_found ) {
 			$pw = $this->_get_next_pw( $pw );
 
 			$pw_found = true;
-			foreach ( [ /*'_has_illegal_chars' => false,*/ '_has_two_letter_pairs' => true, '_has_straight' => true ] as $func => $ret ) {
+			foreach ( [ '_has_two_letter_pairs' => true, '_has_straight' => true ] as $func => $ret ) {
 				// Does our check pass back what we need for a valid password?
 				if ( call_user_func( [ $this, $func ], $pw ) !== $ret ) {
 					$pw_found = false;
@@ -104,20 +106,31 @@ class Challenge11 extends Challenge {
 				}
 			}
 		}
-		$this->_next_pw = $pw;
+		return $pw;
+	}
+
+	/**
+	 * The main method where the challenge gets solved.
+	 */
+	public function solve() {
+		// Get the next valid password for part 1.
+		$this->_next_pw[1] = $this->_get_next_valid_pw( $this->_input );
+
+		// And the next valid password for part 2.
+		$this->_next_pw[2] = $this->_get_next_valid_pw( $this->_next_pw[1] );
 	}
 
 	/**
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		echo 'Next valid pasword: ' . $this->_next_pw;
+		echo 'Next valid pasword: ' . $this->_next_pw[1];
 	}
 
 	/**
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'Next valid pasword: ' . $this->_next_pw[2];
 	}
 }
