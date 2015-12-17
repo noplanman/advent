@@ -30,23 +30,24 @@ class Challenge13 extends Challenge {
 	 *
 	 * @var array
 	 */
-	private $_biggest_happiness = [];
+	private $_biggest_happiness = [ 1 => [], 2 => [] ];
 
 	/**
 	 * Calculate happiness of all permutations. (http://stackoverflow.com/a/10223120/3757422)
 	 *
-	 * @param array $items List of all the people to calculate the happiness for.
-	 * @param array $perms The current sitting arrangement.
+	 * @param integer $part  The current challenge part, 1 or 2.
+	 * @param array   $items List of all the people to calculate the happiness for.
+	 * @param array   $perms The current sitting arrangement.
 	 */
-	private function _calculate_happiness( $items, $perms = [] ) {
+	private function _calculate_happiness( $part, $items, $perms = [] ) {
 		if ( empty( $items ) ) {
 			$happiness = $this->_get_happiness( $perms );
 
-			if ( empty( $this->_biggest_happiness ) || $happiness > max( $this->_biggest_happiness ) ) {
-				$this->_biggest_happiness = [ implode( ' -> ', $perms ) => $happiness ];
-			} elseif ( max( $this->_biggest_happiness ) === $happiness  ) {
+			if ( empty( $this->_biggest_happiness[ $part ] ) || $happiness > max( $this->_biggest_happiness[ $part ] ) ) {
+				$this->_biggest_happiness[ $part ] = [ implode( ' -> ', $perms ) => $happiness ];
+			} elseif ( max( $this->_biggest_happiness[ $part ] ) === $happiness  ) {
 				// Save all sitting arrangements that have the same biggest happiness.
-				$this->_biggest_happiness[ implode( ' -> ', $perms ) ] = $happiness;
+				$this->_biggest_happiness[ $part ][ implode( ' -> ', $perms ) ] = $happiness;
 			}
 		} else {
 			for ( $i = count( $items ) - 1; $i >= 0; --$i ) {
@@ -54,7 +55,7 @@ class Challenge13 extends Challenge {
 				$newperms = $perms;
 				list( $foo ) = array_splice( $newitems, $i, 1 );
 				array_unshift( $newperms, $foo );
-				$this->_calculate_happiness( $newitems, $newperms );
+				$this->_calculate_happiness( $part, $newitems, $newperms );
 			}
 		}
 	}
@@ -98,18 +99,30 @@ class Challenge13 extends Challenge {
 			}
 		}
 
-		$this->_calculate_happiness( array_keys( $this->_people ) );
+		// Calculate happiness points for part 1.
+		$this->_calculate_happiness( 1, array_keys( $this->_people ) );
+
+		// Add myself for part 2.
+		$me = 'Le Moi';
+		foreach ( array_keys( $this->_people ) as $person ) {
+			$this->_people[ $me ][ $person ] = $this->_people[ $person ][ $me ] = 0;
+		}
+
+		// Calculate happiness points for part 2.
+		$this->_calculate_happiness( 2, array_keys( $this->_people ) );
 
 		// Sort the keys to make the output prettier.
-		ksort( $this->_biggest_happiness );
+		array_walk( $this->_biggest_happiness, function( &$item ) {
+			ksort( $item );
+		} );
 	}
 
 	/**
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		echo 'Sitting arrangement with most happiness points: ' . max( $this->_biggest_happiness ) . "\n";
-		foreach ( array_keys( $this->_biggest_happiness ) as $arrangement ) {
+		echo 'Sitting arrangement with most happiness points: ' . max( $this->_biggest_happiness[1] ) . "\n";
+		foreach ( array_keys( $this->_biggest_happiness[1] ) as $arrangement ) {
 			echo $arrangement . "\n";
 		}
 		echo "\n";
@@ -119,6 +132,10 @@ class Challenge13 extends Challenge {
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'Sitting arrangement including myself with most happiness points: ' . max( $this->_biggest_happiness[2] ) . "\n";
+		foreach ( array_keys( $this->_biggest_happiness[2] ) as $arrangement ) {
+			echo $arrangement . "\n";
+		}
+		echo "\n";
 	}
 }
