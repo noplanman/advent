@@ -31,11 +31,15 @@ class Challenge14 extends Challenge {
 	 * The main method where the challenge gets solved.
 	 */
 	public function solve() {
+		$this->quicker = [];
 		foreach ( explode( "\n", $this->_input ) as $reindeer_info ) {
 			// (Jahnny) can fly (10) km/s for (20) seconds, but then must rest for (2) seconds.
 			preg_match( '/(?P<name>\w+) .+ (?P<speed>\d+) .+ (?P<flytime>\d+) .+ (?P<resttime>\d+) .+/', $reindeer_info, $reindeer_infos );
 			extract( $reindeer_infos );
 			$this->_reindeers[ $name ] = new Challenge14_Reindeer( $name, $speed, $flytime, $resttime );
+
+			// There is also a much quicker way to simply get the distance!
+			$this->quicker[ $name ] = $speed * ( $flytime * ( floor( 2503 / ( $flytime + $resttime ) ) ) + min( $flytime, 2503 % ( $flytime + $resttime ) ) );
 		}
 
 		for ( $i = 0; $i < 2503; $i++ ) {
