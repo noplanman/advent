@@ -28,10 +28,25 @@ class Challenge14 extends Challenge {
 	private $_reindeers = [];
 
 	/**
+	 * Reward the leading reindeers.
+	 */
+	private function _reward_leaders() {
+		$ranking = [];
+		foreach ( $this->_reindeers as $reindeer ) {
+			$ranking[ $reindeer->get_distance() ][] = $reindeer;
+		}
+		krsort( $ranking );
+
+		foreach ( reset( $ranking ) as $reindeer ) {
+			$reindeer->reward();
+		}
+	}
+
+	/**
 	 * The main method where the challenge gets solved.
 	 */
 	public function solve() {
-		$this->quicker = [];
+		//$this->quicker = [];
 		foreach ( explode( "\n", $this->_input ) as $reindeer_info ) {
 			// (Jahnny) can fly (10) km/s for (20) seconds, but then must rest for (2) seconds.
 			preg_match( '/(?P<name>\w+) .+ (?P<speed>\d+) .+ (?P<flytime>\d+) .+ (?P<resttime>\d+) .+/', $reindeer_info, $reindeer_infos );
@@ -39,13 +54,15 @@ class Challenge14 extends Challenge {
 			$this->_reindeers[ $name ] = new Challenge14_Reindeer( $name, $speed, $flytime, $resttime );
 
 			// There is also a much quicker way to simply get the distance!
-			$this->quicker[ $name ] = $speed * ( $flytime * ( floor( 2503 / ( $flytime + $resttime ) ) ) + min( $flytime, 2503 % ( $flytime + $resttime ) ) );
+			//$this->quicker[ $name ] = $speed * ( $flytime * ( floor( 2503 / ( $flytime + $resttime ) ) ) + min( $flytime, 2503 % ( $flytime + $resttime ) ) );
 		}
 
 		for ( $i = 0; $i < 2503; $i++ ) {
 			foreach ( $this->_reindeers as $reindeer ) {
 				$reindeer->fly();
 			}
+			// For part 2, we reward the reindeers that are in the lead.
+			$this->_reward_leaders();
 		}
 	}
 
@@ -67,7 +84,14 @@ class Challenge14 extends Challenge {
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		// Find the reindeer with the most reward points.
+		$reindeers = $this->_reindeers;
+		usort( $reindeers, function( $a, $b ) {
+			return $a->get_reward_points() <=> $b->get_reward_points();
+		} );
+		$winner = end( $reindeers );
+
+		printf( 'Most reward points after 2503 seconds: %s, with %d reward points.', $winner->get_name(), $winner->get_reward_points() );
 	}
 }
 
@@ -82,6 +106,13 @@ class Challenge14_Reindeer {
 	 * @var string
 	 */
 	private $_name;
+
+	/**
+	 * Reward points for being in the lead.
+	 *
+	 * @var integer
+	 */
+	private $_reward_points = 0;
 
 	/**
 	 * Flying speed.
@@ -189,6 +220,21 @@ class Challenge14_Reindeer {
 				$this->_resttime_elapsed = 0;
 			}
 		}
+	}
 
+	/**
+	 * Reward this reindeer for being in the lead.
+	 */
+	public function reward() {
+		$this->_reward_points++;
+	}
+
+	/**
+	 * Get the number of reward points this reindeer has earned.
+	 *
+	 * @return integer Number of reward points earned.
+	 */
+	public function get_reward_points() {
+		return $this->_reward_points;
 	}
 }
