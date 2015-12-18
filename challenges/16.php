@@ -37,13 +37,6 @@ class Challenge16 extends Challenge {
 	];
 
 	/**
-	 * List of all aunties.
-	 *
-	 * @var array
-	 */
-	private $_aunties = [];
-
-	/**
 	 * The number of the auntie the present is from.
 	 *
 	 * @var integer
@@ -59,15 +52,10 @@ class Challenge16 extends Challenge {
 			// They're all called Sue...
 			array_shift( $auntie_compounds );
 			$auntie_nr = array_shift( $auntie_compounds );
-			for ( $i = 0; $i < count( $auntie_compounds ); $i += 2 ) {
-				$this->_aunties[ $auntie_nr ][ $auntie_compounds[ $i ] ] = (int) $auntie_compounds[ $i + 1 ];
-			}
-		}
 
-		foreach ( $this->_aunties as $auntie_nr => $auntie_compounds ) {
 			$perfect_fit = true;
-			foreach ( $auntie_compounds as $compound_name => $compound_value ) {
-				if ( $compound_value !== $this->_present_data[ $compound_name ] ) {
+			for ( $i = 0; $i < count( $auntie_compounds ); $i += 2 ) {
+				if ( (int) $auntie_compounds[ $i + 1 ] !== $this->_present_data[ $auntie_compounds[ $i ] ] ) {
 					$perfect_fit = false;
 					break;
 				}
