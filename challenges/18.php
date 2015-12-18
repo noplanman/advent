@@ -26,10 +26,17 @@ class Challenge18 extends Challenge {
 	private $_current_configuration = [];
 
 	/**
+	 * Number of lights burning in the last configuration, for both part 1 and 2.
+	 *
+	 * @var array
+	 */
+	private $_lights_on = [ 1 => 0, 2 => 0 ];
+
+	/**
 	 * Get the number of burning lights surrounding the passed light.
 	 *
-	 * @param integer $x X coordinate of the light.
-	 * @param integer $y Y coordinate of the light.
+	 * @param integer $x    X coordinate of the light.
+	 * @param integer $y    Y coordinate of the light.
 	 * @return integer Number of burning lights surrounding this light.
 	 */
 	private function _get_neighbouring_lights_count( $x, $y ) {
@@ -49,8 +56,10 @@ class Challenge18 extends Challenge {
 
 	/**
 	 * Set the next lighting configuration.
+	 *
+	 * @param integer $part The part we're getting the next configuration for.
 	 */
-	private function _set_next_configuration() {
+	private function _set_next_configuration( $part ) {
 		// Start off with a copy of the current configuration.
 		$next_configuration = $this->_current_configuration;
 
@@ -66,43 +75,72 @@ class Challenge18 extends Challenge {
 		}
 
 		$this->_current_configuration = $next_configuration;
+
+		// For part 2, keep the corners lit.
+		( 2 === $part ) && $this->_set_stuck_corner_lights();
+	}
+
+	/**
+	 * Set the 4 stuck corner lights to on.
+	 */
+	private function _set_stuck_corner_lights() {
+		$this->_current_configuration[0][0] = true;
+		$this->_current_configuration[0][99] = true;
+		$this->_current_configuration[99][0] = true;
+		$this->_current_configuration[99][99] = true;
+	}
+
+	/**
+	 * Run through all configurations.
+	 *
+	 * @param integer $part The part we're processing.
+	 */
+	private function _process_all_configurations( $part ) {
+		for ( $i = 0; $i < 100; $i++ ) {
+			$this->_set_next_configuration( $part );
+		}
+		// Save the number of burning lights at the end.
+		foreach ( $this->_current_configuration as $row ) {
+			$this->_lights_on[ $part ] += count( array_filter( $row ) );
+		}
 	}
 
 	/**
 	 * The main method where the challenge gets solved.
 	 */
 	public function solve() {
+		$base_configuration = [];
 		$x = 0;
 		foreach ( explode( "\n", $this->_input ) as $lights ) {
 			$y = 0;
 			foreach ( str_split( $lights ) as $light ) {
-				$this->_current_configuration[ $x ][ $y++ ] = ( '#' === $light );
+				$base_configuration[ $x ][ $y++ ] = ( '#' === $light );
 			}
 			$x++;
 		}
 
-		// Now, let's get the next configuration 100 times.
-		for ( $i = 0; $i < 100; $i++ ) {
-			$this->_set_next_configuration();
-		}
+		// Part 1.
+		$this->_current_configuration = $base_configuration;
+		$this->_process_all_configurations( 1 );
+
+		// Part 2.
+		$this->_current_configuration = $base_configuration;
+		// Set the stuck lights.
+		$this->_set_stuck_corner_lights();
+		$this->_process_all_configurations( 2 );
 	}
 
 	/**
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		$lights_on = 0;
-		foreach ( $this->_current_configuration as $row ) {
-			$lights_on += count( array_filter( $row ) );
-		}
-
-		printf( 'There are %d lights on.', $lights_on );
+		printf( 'There are %d lights on.', $this->_lights_on[1] );
 	}
 
 	/**
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		printf( 'With the stuck corner lights, there are now %d lights on.', $this->_lights_on[2] );
 	}
 }
