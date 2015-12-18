@@ -31,6 +31,34 @@ class Challenge15 extends Challenge {
 	 * @var array
 	 */
 	private $_highest_score = [ 0 ];
+	private $_highest_calorie_score = [ 0 ];
+
+	/**
+	 * Get the total raw scores for all ingredient properties.
+	 * @param array $ingredient_counts Array of ingredients and their amount of spoons.
+	 * @return array Total raw scores.
+	 */
+	private function _get_total_score_raw( $ingredient_counts ) {
+		$totals = [
+			'capacity'   => 0,
+			'durability' => 0,
+			'flavor'     => 0,
+			'texture'    => 0,
+			'calories'   => 0,
+		];
+
+		foreach ( $ingredient_counts as $name => $spoons ) {
+			foreach ( $this->_ingredients[ $name ]->get_scores( $spoons ) as $key => $value ) {
+				$totals[ $key ] += $value;
+			}
+		}
+
+		foreach ( $totals as &$total ) {
+			$total = max( 0, $total );
+		}
+
+		return $totals;
+	}
 
 	/**
 	 * Get the total score using the passed amount of ingredients.
@@ -39,24 +67,20 @@ class Challenge15 extends Challenge {
 	 * @return integer The total cookie score.
 	 */
 	private function _get_total_score( $ingredient_counts ) {
-		$totals = [
-			'capacity'   => 0,
-			'durability' => 0,
-			'flavor'     => 0,
-			'texture'    => 0,
-		];
+		$total_score_raw = $this->_get_total_score_raw( $ingredient_counts );
+		// Ignore the calories for the score.
+		unset( $total_score_raw['calories'] );
+		return array_product( $total_score_raw );
+	}
 
-		foreach ( $ingredient_counts as $name => $spoons ) {
-			foreach ( $this->_ingredients[ $name ]->get_scores( $spoons ) as $key => $value ) {
-		    $totals[ $key ] += $value;
-			}
-		}
-
-		foreach ( $totals as &$total ) {
-			$total = max( 0, $total );
-		}
-
-		return array_product( $totals );
+	/**
+	 * Get the total calories using the passed amount of ingredients.
+	 *
+	 * @param array $ingredient_counts Array of ingredients and their amount of spoons.
+	 * @return integer The total cookie calories.
+	 */
+	private function _get_total_calories( $ingredient_counts ) {
+		return $this->_get_total_score_raw( $ingredient_counts )['calories'];
 	}
 
 	/**
@@ -86,13 +110,21 @@ class Challenge15 extends Challenge {
 							'Frosting'     => $k,
 							'Sugar'        => $l,
 						];
+						$recipe = [];
+						foreach ( $combo as $key => $value ) {
+							$recipe[] = $value . 'x ' . $key;
+						}
+						$recipe = implode( ', ', $recipe );
+
 						$total = $this->_get_total_score( $combo );
+
 						if ( $total > max( $this->_highest_score ) ) {
-							$recipe = [];
-							foreach ( $combo as $key => $value ) {
-								$recipe[] = $value . 'x ' . $key;
-							}
-							$this->_highest_score = [ implode( ', ', $recipe ) => $total ];
+							$this->_highest_score = [ $recipe => $total ];
+						}
+
+						// For part 2, only regard the cookies with exactly 500 calories.
+						if ( 500 === $this->_get_total_calories( $combo ) && $total > max( $this->_highest_calorie_score ) ) {
+							$this->_highest_calorie_score = [ $recipe => $total ];
 						}
 					}
 				}
@@ -112,7 +144,8 @@ class Challenge15 extends Challenge {
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		echo 'Highest score with 500 calories: ' . max( $this->_highest_calorie_score ) . "\n";
+		echo 'Recipe: ' . array_keys( $this->_highest_calorie_score )[0] . "\n";
 	}
 }
 
@@ -165,6 +198,7 @@ class Challenge15_Ingredient {
 			'durability' => $spoons * $this->_durability,
 			'flavor'     => $spoons * $this->_flavor,
 			'texture'    => $spoons * $this->_texture,
+			'calories'   => $spoons * $this->_calories,
 		];
 	}
 }
