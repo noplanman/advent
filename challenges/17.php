@@ -23,7 +23,7 @@ class Challenge17 extends Challenge {
 	 *
 	 * @var array
 	 */
-	private $_combinations = [];
+	private $_150l_combinations = [];
 
 	/**
 	 * Get container size combinations. (http://docstore.mik.ua/orelly/webprog/pcook/ch04_25.htm)
@@ -51,24 +51,34 @@ class Challenge17 extends Challenge {
 
 		$container_sizes = explode( "\n", $this->_input );
 
-		$this->_combinations = $this->_container_combinations( $container_sizes );
+		$this->_150l_combinations = array_filter( $this->_container_combinations( $container_sizes ), function( $combination ) {
+			return ( 150 === array_sum( $combination ) );
+		} );
 	}
 
 	/**
 	 * Output the solution for part 1.
 	 */
 	public function output_part_1() {
-		$combinations = 0;
-		foreach ( $this->_combinations as $combination ) {
-			( 150 === array_sum( $combination ) ) && $combinations++;
-		}
-		echo 'Possible combinations to store 150L of eggnog: ' . $combinations;
+		printf( 'Possible combinations to store 150L of eggnog: %d', count( $this->_150l_combinations ) );
 	}
 
 	/**
 	 * Output the solution for part 2.
 	 */
 	public function output_part_2() {
-		echo '';
+		// Sort them by container count.
+		usort( $this->_150l_combinations, function( $a, $b ) {
+			return count( $a ) <=> count( $b );
+		} );
+
+		$min_combinations = 0;
+
+		$min = $current = count( reset( $this->_150l_combinations ) );
+		while ( $min === $current ) {
+			$min_combinations++;
+			$current = count( next( $this->_150l_combinations ) );
+		}
+		printf( '150L requires a minimum of %d containers. There are a total of %d combinations.', $min, $min_combinations );
 	}
 }
