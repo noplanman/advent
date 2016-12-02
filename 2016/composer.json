@@ -1,0 +1,29 @@
+{
+    "name": "noplanman/telegram-bot-manager",
+    "type": "library",
+    "description": "PHP Telegram Bot Manager",
+    "keywords": ["telegram", "bot", "manager"],
+    "license": "MIT",
+    "homepage": "https://github.com/noplanman/php-telegram-bot-manager",
+    "support": {
+        "issues": "https://github.com/noplanman/php-telegram-bot-manager/issues",
+        "source": "https://github.com/noplanman/php-telegram-bot-manager"
+    },
+    "authors": [
+        {
+            "name": "Armando Lüscher",
+            "email": "armando@noplanman.ch",
+            "homepage": "https://noplanman.ch",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "league/climate": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "AOC\\": "src"
+        }
+    }
+}
