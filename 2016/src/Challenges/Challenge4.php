@@ -21,8 +21,8 @@ class Challenge4 extends ChallengeBase
     /**
      * @var int Solution for part 1.
      */
-    private $part_1;
-    
+    private $part_1 = 0;
+
     /**
      * Check if the passed letters and checksum are a valid room.
      *
@@ -58,33 +58,50 @@ class Challenge4 extends ChallengeBase
     }
 
     /**
-     * Solve part 1 and save the answer to $this->part_1.
+     * Get the list of valid rooms in a nicely formatted array.
      *
      * @param array $rooms
+     * @return array
      */
-    private function solve_1($rooms)
+    private function get_valid_rooms(array $rooms)
     {
-        $this->part_1 = 0;
+        $valid_rooms = [];
         
-        /** @var array $room */
-        foreach ($rooms as $room) {
-            preg_match('/(\d*)\[(.*)\]/', array_pop($room), $id_checksum);
+        /** @var array $room_names */
+        foreach ($rooms as $room_names) {
+            preg_match('/(\d*)\[(.*)\]/', array_pop($room_names), $id_checksum);
             list(, $sector_id, $checksum) = $id_checksum;
 
             $letters = [];
 
             /** @var string $code */
-            foreach ($room as $code) {
-                foreach (str_split($code) as $char) {
-                    if (isset($letters[$char])) {
-                        $letters[$char]++;
+            foreach ($room_names as $room_name) {
+                foreach (str_split($room_name) as $letter) {
+                    if (isset($letters[$letter])) {
+                        $letters[$letter]++;
                     } else {
-                        $letters[$char] = 1;
+                        $letters[$letter] = 1;
                     }
                 }
             }
 
-            $this->is_valid_room($letters, $checksum) && $this->part_1 += $sector_id;
+            if ($this->is_valid_room($letters, $checksum)) {
+                $valid_rooms[] = compact('sector_id', 'checksum', 'room_names');
+            }
+        }
+
+        return $valid_rooms;
+    }
+
+    /**
+     * Solve part 1 and save the answer to $this->part_1.
+     *
+     * @param array $rooms
+     */
+    private function solve_1(array $rooms)
+    {
+        foreach ($rooms as $room) {
+            $this->part_1 += $room['sector_id'];
         }
     }
 
@@ -99,8 +116,10 @@ class Challenge4 extends ChallengeBase
         array_walk($rooms, function (&$room) {
             $room = explode('-', $room);
         });
+        
+        $valid_rooms = $this->get_valid_rooms($rooms);
 
-        $this->solve_1($rooms);
+        $this->solve_1($valid_rooms);
     }
 
     /**
