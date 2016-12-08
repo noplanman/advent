@@ -24,6 +24,11 @@ class Challenge4 extends ChallengeBase
     private $part_1 = 0;
 
     /**
+     * @var int Solution for part 2.
+     */
+    private $part_2 = -1;
+
+    /**
      * Check if the passed letters and checksum are a valid room.
      *
      * @param array $letters
@@ -66,7 +71,7 @@ class Challenge4 extends ChallengeBase
     private function get_valid_rooms(array $rooms)
     {
         $valid_rooms = [];
-        
+
         /** @var array $room_names */
         foreach ($rooms as $room_names) {
             preg_match('/(\d*)\[(.*)\]/', array_pop($room_names), $id_checksum);
@@ -94,6 +99,29 @@ class Challenge4 extends ChallengeBase
     }
 
     /**
+     * Caesar cipher for the passed string.
+     *
+     * @param string $string
+     * @param int $rotation
+     * @return string
+     */
+    private function caesar($string, $rotation)
+    {
+        $new_string = '';
+        $rotation %= 26;
+
+        foreach (str_split($string) as $char) {
+            $ascii = ord($char);
+            for ($j = 0; $j < $rotation; $j++) {
+                122 === $ascii++ && $ascii = 97;
+            }
+            $new_string .= chr($ascii);
+        }
+
+        return $new_string;
+    }
+
+    /**
      * Solve part 1 and save the answer to $this->part_1.
      *
      * @param array $rooms
@@ -102,6 +130,29 @@ class Challenge4 extends ChallengeBase
     {
         foreach ($rooms as $room) {
             $this->part_1 += $room['sector_id'];
+        }
+    }
+
+    /**
+     * Solve part 2 and save the answer to $this->part_2.
+     *
+     * @param array $rooms
+     */
+    private function solve_2(array $rooms)
+    {
+        foreach ($rooms as $room) {
+            $room_name_deciphered = '';
+
+            /** @var array $room_names */
+            $room_names = $room['room_names'];
+            foreach ($room_names as $room_name) {
+                $room_name_deciphered .= $this->caesar($room_name, $room['sector_id']);
+            }
+
+            if ('northpoleobjectstorage' === $room_name_deciphered) {
+                $this->part_2 = $room['sector_id'];
+                return;
+            }
         }
     }
 
@@ -116,10 +167,11 @@ class Challenge4 extends ChallengeBase
         array_walk($rooms, function (&$room) {
             $room = explode('-', $room);
         });
-        
+
         $valid_rooms = $this->get_valid_rooms($rooms);
 
         $this->solve_1($valid_rooms);
+        $this->solve_2($valid_rooms);
     }
 
     /**
@@ -135,6 +187,6 @@ class Challenge4 extends ChallengeBase
      */
     public function output_part_2()
     {
-        echo '';
+        echo 'Northpole object storage has sector ID: ' . $this->part_2;
     }
 }
