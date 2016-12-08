@@ -21,12 +21,12 @@ class Challenge3 extends ChallengeBase
     /**
      * @var int Solution for part 1.
      */
-    private $part_1;
+    private $part_1 = 0;
 
     /**
      * @var int Solution for part 2.
      */
-    private $part_2;
+    private $part_2 = 0;
 
     /**
      * Calculate if triangle is possible.
@@ -61,7 +61,6 @@ class Challenge3 extends ChallengeBase
      */
     private function solve_2(array $triangles)
     {
-        $this->part_2 = 0;
         for ($i = 0; $i < 3; ++$i) {
             // Get each column and divide into chunks of 3, each representing a triangle.
             $this->part_2 += count(array_filter(array_chunk(array_column($triangles, $i), 3), function ($triangle) {

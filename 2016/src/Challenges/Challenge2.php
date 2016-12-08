@@ -19,14 +19,14 @@ class Challenge2 extends ChallengeBase
     protected static $day = 2;
 
     /**
-     * @var int Solution for part 1.
+     * @var string Solution for part 1.
      */
-    private $part_1;
+    private $part_1 = '';
 
     /**
-     * @var int Solution for part 2.
+     * @var string Solution for part 2.
      */
-    private $part_2;
+    private $part_2 = '';
 
     /**
      * Calculate the next valid step.
